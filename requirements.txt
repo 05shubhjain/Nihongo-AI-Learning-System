@@ -5,3 +5,5 @@ easyocr
 Pillow
 numpy
 fugashi
+torch
+torchvision
