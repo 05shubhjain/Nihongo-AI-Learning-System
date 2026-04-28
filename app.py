@@ -5,6 +5,7 @@ import easyocr
 from PIL import Image
 import numpy as np
 from fugashi import Tagger
+import unidic_lite
 import random
 import os
 
@@ -497,7 +498,6 @@ elif menu == "🖼 OCR":
             st.success(translated)
             add_history("OCR Scan")
 
-# ---------------- GRAMMAR ----------------
 elif menu == "🧠 Grammar":
 
     st.header("Grammar Explanation")
@@ -509,21 +509,25 @@ elif menu == "🧠 Grammar":
         translated = GoogleTranslator(source='ja', target='en').translate(sentence)
         st.success(translated)
 
-        tagger = Tagger()
-        words = tagger(sentence)
+        try:
+            tagger = Tagger('-d "{}"'.format(unidic_lite.DICDIR))
 
-        for word in words:
+            words = tagger(sentence)
 
-            jp_word = word.surface
+            for word in words:
 
-            try:
-                meaning = GoogleTranslator(source='ja', target='en').translate(jp_word)
-            except:
-                meaning = "Not Found"
+                jp_word = word.surface
 
-            st.write(f"{jp_word} → {meaning}")
+                try:
+                    meaning = GoogleTranslator(source='ja', target='en').translate(jp_word)
+                except:
+                    meaning = "Not Found"
 
-        add_history("Grammar Analysis")
+                st.write(f"{jp_word} → {meaning}")
+
+        except Exception as e:
+            st.error("Japanese tokenizer failed to load.")
+            st.write(e)
 
 # ---------------- FLASHCARDS ----------------
 elif menu == "🃏 Flashcards":
